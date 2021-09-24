@@ -1,0 +1,7 @@
+set timeout 600
+spawn bash /var/www/html/OS/BPA/updateBPA306.sh
+expect -re "Do you want to *" {
+    send "Y\r"
+    exp_continue
+}
+

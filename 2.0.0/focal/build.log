@@ -1,0 +1,236 @@
+Sending build context to Docker daemon  65.02kB
+Step 1/78 : FROM ubuntu:focal
+ ---> fb52e22af1b0
+Step 2/78 : ENV DEBIAN_FRONTEND=noninteractive
+ ---> Using cache
+ ---> 6f9a1607cc6e
+Step 3/78 : RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+ ---> Using cache
+ ---> 83dd3a0b2e2d
+Step 4/78 : RUN apt-get update
+ ---> Using cache
+ ---> d70b269f0948
+Step 5/78 : RUN apt-get -y install apt-transport-https lsb-core lsb-release net-tools netcat-openbsd sudo software-properties-common expect
+ ---> Using cache
+ ---> 2f4541fcb01b
+Step 6/78 : RUN apt-get install -y --no-install-recommends tzdata
+ ---> Using cache
+ ---> 49093b60a1b5
+Step 7/78 : RUN dpkg-reconfigure --frontend noninteractive tzdata
+ ---> Using cache
+ ---> e24047005fb7
+Step 8/78 : RUN touch /usr/bin/firewall-cmd
+ ---> Using cache
+ ---> a7e8deefd063
+Step 9/78 : RUN chmod +x /usr/bin/firewall-cmd
+ ---> Using cache
+ ---> b8fbf1c39aa3
+Step 10/78 : RUN useradd -m expedition
+ ---> Using cache
+ ---> 26ed3386bfdf
+Step 11/78 : RUN add-apt-repository ppa:adiscon/v8-stable -y
+ ---> Using cache
+ ---> ab53c9e6043b
+Step 12/78 : RUN echo 'deb [trusted=yes] https://conversionupdates.paloaltonetworks.com/ expedition-updates/' > /etc/apt/sources.list.d/ex-repo.list
+ ---> Using cache
+ ---> 47be24117ec1
+Step 13/78 : RUN curl -1sLf "https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA" | gpg --dearmor > /usr/share/keyrings/com.rabbitmq.team.gpg
+ ---> Using cache
+ ---> 9c714efef2ad
+Step 14/78 : RUN curl -1sLf "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf77f1eda57ebb1cc" | gpg --dearmor > /usr/share/keyrings/net.launchpad.ppa.rabbitmq.erlang.gpg
+ ---> Using cache
+ ---> a6955e9b03f3
+Step 15/78 : RUN curl -1sLf "https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey" | gpg --dearmor > /usr/share/keyrings/io.packagecloud.rabbitmq.gpg
+ ---> Using cache
+ ---> 9033a09b291b
+Step 16/78 : RUN echo '    deb [signed-by=/usr/share/keyrings/net.launchpad.ppa.rabbitmq.erlang.gpg] http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu focal main\n    deb-src [signed-by=/usr/share/keyrings/net.launchpad.ppa.rabbitmq.erlang.gpg] http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu focal main\n    deb [signed-by=/usr/share/keyrings/io.packagecloud.rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ focal main\n    deb-src [signed-by=/usr/share/keyrings/io.packagecloud.rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ focal main\n' > /etc/apt/sources.list.d/rabbitmq.list
+ ---> Using cache
+ ---> d381b53de3c7
+Step 17/78 : RUN cat /etc/apt/sources.list.d/rabbitmq.list
+ ---> Using cache
+ ---> 45ae0887a2fc
+Step 18/78 : RUN apt-get update -y
+ ---> Using cache
+ ---> 02f6ac1ac8f7
+Step 19/78 : RUN apt-get install -y wget
+ ---> Using cache
+ ---> 0945d458746e
+Step 20/78 : RUN add-apt-repository ppa:ondrej/php
+ ---> Using cache
+ ---> 046aa2d3db91
+Step 21/78 : RUN apt-get update
+ ---> Using cache
+ ---> 4fde58684841
+Step 22/78 : RUN apt-get -y install openssh-server     net-tools     zlib1g-dev     rsyslog     apache2     php7.0 libapache2-mod-php7.0     php7.0-bcmath php7.0-mbstring php7.0-gd php7.0-soap php7.0-zip php7.0-xml php7.0-opcache php7.0-curl php7.0-bz2 php7.0-mcrypt     php7.0-ldap     php7.0-mysql     openssl
+ ---> Using cache
+ ---> 4fdc03015d28
+Step 23/78 : RUN mkdir /home/userSpace &&    chown www-data:www-data -R /home/userSpace &&    mkdir /data &&    chown www-data:www-data -R /data &&    mkdir /PALogs && chown www-data:www-data -R /PALogs
+ ---> Using cache
+ ---> 203976683f36
+Step 24/78 : RUN chmod 777 /tmp
+ ---> Using cache
+ ---> 3a4a6a574178
+Step 25/78 : RUN systemctl disable syslog.service
+ ---> Using cache
+ ---> 655bd72ca62a
+Step 26/78 : RUN cp /lib/systemd/system/rsyslog.service /etc/systemd/system/rsyslog.service
+ ---> Using cache
+ ---> 8e0c9d36fae9
+Step 27/78 : RUN a2ensite default-ssl; a2enmod ssl
+ ---> Using cache
+ ---> 7c41466baa28
+Step 28/78 : RUN usermod -a -G expedition www-data
+ ---> Using cache
+ ---> 9ba95b1afdcc
+Step 29/78 : RUN sed -i 's/mysqli.reconnect = Off/mysqli.reconnect = On/g' /etc/php/7.0/apache2/php.ini
+ ---> Using cache
+ ---> 97572052af79
+Step 30/78 : RUN sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/g' /etc/php/7.0/apache2/php.ini
+ ---> Using cache
+ ---> cadb634770fa
+Step 31/78 : RUN sed -i 's/post_max_size = 8M/post_max_size = 200M/g' /etc/php/7.0/apache2/php.ini
+ ---> Using cache
+ ---> 73359586b72e
+Step 32/78 : RUN sed -i 's/mysqli.reconnect = Off/mysqli.reconnect = On/g' /etc/php/7.0/cli/php.ini
+ ---> Using cache
+ ---> 5c5f57fe7815
+Step 33/78 : RUN sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/g' /etc/php/7.0/cli/php.ini
+ ---> Using cache
+ ---> 05feac4602fa
+Step 34/78 : RUN sed -i 's/post_max_size = 8M/post_max_size = 200M/g' /etc/php/7.0/cli/php.ini
+ ---> Using cache
+ ---> 4cb23c0070af
+Step 35/78 : RUN groupadd -r mysql && useradd -r -g mysql mysql
+ ---> Using cache
+ ---> d280b2d4802e
+Step 36/78 : RUN set -ex;     apt-get update;     if ! which gpg; then         apt-get install -y --no-install-recommends gnupg;     fi;
+ ---> Using cache
+ ---> 78639ad701a9
+Step 37/78 : ENV GOSU_VERSION 1.14
+ ---> Using cache
+ ---> 798501be3969
+Step 38/78 : RUN set -eux;     apt-get update;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates;     savedAptMark="$(apt-mark showmanual)";     apt-get install -y --no-install-recommends wget;     dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')";     wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch";     wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc";     export GNUPGHOME="$(mktemp -d)";     gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4;     gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu;     gpgconf --kill all;     rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc;     apt-mark auto '.*' > /dev/null;     [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null;     chmod +x /usr/local/bin/gosu;     gosu --version;     gosu nobody true
+ ---> Using cache
+ ---> 86a8593725ab
+Step 39/78 : RUN mkdir /docker-entrypoint-initdb.d
+ ---> Using cache
+ ---> 8b90f54db0c0
+Step 40/78 : RUN set -ex;     apt-get update;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends         libjemalloc2         pwgen         xz-utils         zstd     ;
+ ---> Using cache
+ ---> 63475c351027
+Step 41/78 : ARG GPG_KEYS=177F4010FE56CA3336300305F1656F24C74CD1D8
+ ---> Using cache
+ ---> 38f6fa248791
+Step 42/78 : RUN set -ex;     export GNUPGHOME="$(mktemp -d)";     for key in $GPG_KEYS; do         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key";     done;     gpg --batch --export $GPG_KEYS > /etc/apt/trusted.gpg.d/mariadb.gpg;     command -v gpgconf > /dev/null && gpgconf --kill all || :;     rm -fr "$GNUPGHOME";     apt-key list
+ ---> Using cache
+ ---> 98c1b439fd74
+Step 43/78 : ARG MARIADB_MAJOR=10.6
+ ---> Using cache
+ ---> cba78dbb3d2e
+Step 44/78 : ENV MARIADB_MAJOR $MARIADB_MAJOR
+ ---> Using cache
+ ---> 6c883b766125
+Step 45/78 : ARG MARIADB_VERSION=1:10.6.4+maria~focal
+ ---> Using cache
+ ---> eb8681c1d0c4
+Step 46/78 : ENV MARIADB_VERSION $MARIADB_VERSION
+ ---> Using cache
+ ---> e140c8afefef
+Step 47/78 : ARG REPOSITORY="https://archive.mariadb.org/mariadb-10.6.4/repo/ubuntu/ focal main"
+ ---> Using cache
+ ---> a623c0dee52f
+Step 48/78 : RUN set -e;    echo "deb ${REPOSITORY}" > /etc/apt/sources.list.d/mariadb.list;     {         echo 'Package: *';         echo 'Pin: release o=MariaDB';         echo 'Pin-Priority: 999';     } > /etc/apt/preferences.d/mariadb
+ ---> Using cache
+ ---> 5ed1b790fd8c
+Step 49/78 : RUN set -ex;     {         echo "mariadb-server-$MARIADB_MAJOR" mysql-server/root_password password 'unused';         echo "mariadb-server-$MARIADB_MAJOR" mysql-server/root_password_again password 'unused';     } | debconf-set-selections;     apt-get update -y;     apt-get install -y         "mariadb-server=$MARIADB_VERSION"         mariadb-backup         mariadb-client         socat     ;     rm -rf /var/lib/mysql;     mkdir -p /var/lib/mysql /var/run/mysqld;     chown -R mysql:mysql /var/lib/mysql /var/run/mysqld;     chmod 777 /var/run/mysqld;     find /etc/mysql/ -name '*.cnf' -print0         | xargs -0 grep -lZE '^(bind-address|log|user\s)'         | xargs -rt -0 sed -Ei 's/^(bind-address|log|user\s)/#&/';     if [ ! -L /etc/mysql/my.cnf ]; then sed -i -e '/includedir/i[mariadb]\nskip-host-cache\nskip-name-resolve\n' /etc/mysql/my.cnf;     else sed -i -e '/includedir/ {N;s/\(.*\)\n\(.*\)/[mariadbd]\nskip-host-cache\nskip-name-resolve\n\n\2\n\1/}'         /etc/mysql/mariadb.cnf; fi
+ ---> Using cache
+ ---> bcdfd25e2b06
+Step 50/78 : RUN mysql_install_db
+ ---> Using cache
+ ---> 4b56424e31ff
+Step 51/78 : COPY init_mysql.sh /init_mysql.sh
+ ---> Using cache
+ ---> d9b8258250c3
+Step 52/78 : RUN mkdir /build
+ ---> Using cache
+ ---> 2963814b560f
+Step 53/78 : copy setup/databases.tgz /build/databases.tgz
+ ---> Using cache
+ ---> f7586b71daea
+Step 54/78 : RUN chmod 755 /init_mysql.sh
+ ---> Using cache
+ ---> 4709d43f63f3
+Step 55/78 : RUN /init_mysql.sh
+ ---> Using cache
+ ---> eb5ec623aaca
+Step 56/78 : RUN apt-get install -y perl liblist-moreutils-perl python3-pip
+ ---> Using cache
+ ---> 64cd96f0b396
+Step 57/78 : RUN pip install lxml;     pip install --upgrade pip;     pip install unidecode;     pip install pandas;     pip install six;     pip install sqlalchemy
+ ---> Using cache
+ ---> e17b60035304
+Step 58/78 : RUN apt-get install -y rabbitmq-server policycoreutils
+ ---> Using cache
+ ---> 36d7a70b8273
+Step 59/78 : RUN update-rc.d rabbitmq-server defaults
+ ---> Using cache
+ ---> ab27cedc275d
+Step 60/78 : RUN apt-mark hold php-common php-radius php7.0-bcmath php7.0-bz2 php7.0-cli php7.0-common php7.0-curl php7.0-gd     php7.0-json php7.0-ldap php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-opcache php7.0-readline php7.0-soap     php7.0-xml php7.0-zip php7.0 php7.0-common php7.0-radius     mariadb-client-10.3 mariadb-client-core-10.3 mariadb-client     mariadb-server mariadb-common mariadb-server-10.3 mariadb-server-core-10.3
+ ---> Using cache
+ ---> b80d71690179
+Step 61/78 : RUN apt-get install -y --allow-unauthenticated expedition-beta
+ ---> Using cache
+ ---> 337b88a1232d
+Step 62/78 : COPY init_expedition_python.expect /build/init_expedition_python.expect
+ ---> Using cache
+ ---> a7f0cf3ec175
+Step 63/78 : RUN expect /build/init_expedition_python.expect
+ ---> Using cache
+ ---> 5906cdc18f9a
+Step 64/78 : RUN apt-get install -y openjdk-8-jre-headless;     apt-get install -y --allow-unauthenticated expeditionml-dependencies-beta
+ ---> Using cache
+ ---> ab6815f5d7eb
+Step 65/78 : RUN cp /var/www/html/OS/spark/config/log4j.properties /opt/Spark/
+ ---> Using cache
+ ---> 265edbf73ddc
+Step 66/78 : RUN rm -f /home/userSpace/environmentParameters.php
+ ---> Using cache
+ ---> 58006f3a1baa
+Step 67/78 : RUN cp /var/www/html/OS/startup/panReadOrdersStarter /etc/init.d/panReadOrders;     chmod 755 /etc/init.d/panReadOrders;     chown root:root /etc/init.d/panReadOrders;     ln -s  /etc/init.d/panReadOrders /etc/rc2.d/S99panReadOrders;     ln -s  /etc/init.d/panReadOrders /etc/rc3.d/S99panReadOrders;     ln -s  /etc/init.d/panReadOrders /etc/rc4.d/S99panReadOrders;     ln -s  /etc/init.d/panReadOrders /etc/rc5.d/S99panReadOrders
+ ---> Using cache
+ ---> cea7effc0e8b
+Step 68/78 : RUN cp -r /var/lib/mysql /var/lib/mysql.bak
+ ---> Using cache
+ ---> 39b6eb02a2bc
+Step 69/78 : RUN sed -i 's/pip show best-practice-assessment-ngfw-pano/pip show BPA/g' /var/www/html/libs/settings/PackageVersionChecker.php
+ ---> Using cache
+ ---> 22fd24386fc9
+Step 70/78 : RUN chown www-data:www-data /var/www
+ ---> Using cache
+ ---> 1e57ed889407
+Step 71/78 : RUN touch /var/log/{auth.log,kern.log,rsyslog.log,syslog}
+ ---> Using cache
+ ---> 99f44c2390a7
+Step 72/78 : RUN chown syslog:syslog /var/log/{auth.log,kern.log,rsyslog.log,syslog}
+ ---> Using cache
+ ---> 83fc40e43c44
+Step 73/78 : RUN apt-mark hold libmariadbclient18 libmysqlclient18
+ ---> Using cache
+ ---> eaf268c1c4a4
+Step 74/78 : RUN chmod 755 /root
+ ---> Using cache
+ ---> 829a3ade2fda
+Step 75/78 : WORKDIR /
+ ---> Using cache
+ ---> 6cebff7bfb97
+Step 76/78 : RUN rm -rf /setup /tmp/* /build
+ ---> Using cache
+ ---> 2eb633f04b31
+Step 77/78 : COPY start.sh /
+ ---> a65e21346ba9
+Step 78/78 : CMD /start.sh
+ ---> Running in 53061a6836e1
+Removing intermediate container 53061a6836e1
+ ---> 387654afaed6
+Successfully built 387654afaed6
+Successfully tagged expedition:latest

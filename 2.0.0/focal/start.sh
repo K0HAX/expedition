@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+set -euo pipefail
 
 if [[ -d /var/lib/mysql ]]; then
   if [[ ! -e /var/lib/mysql/ibdata1 ]]; then
@@ -11,35 +13,36 @@ fi
 
 # Fix ownership
 chown -R mysql:mysql /var/lib/mysql
-chown -R apache:apache /data
+chown -R www-data:www-data /data
 
 echo 'Starting all services for expedition...'
 
 # Rsyslog
 echo '* Starting rsyslogd...'
-/usr/sbin/rsyslogd -i /var/run/rsyslogd.pid
+chown syslog:syslog /var/log
+/etc/init.d/rsyslog start
 
 # SSHD
 echo '* Starting sshd...'
-/usr/sbin/sshd -f /etc/ssh/sshd_config
+/etc/init.d/ssh start
 
 # RabbitMQ
 echo '* Starting rabbitmq...'
-sudo -u rabbitmq -- rabbitmq-server -detached
+/etc/init.d/rabbitmq-server start
 
 # MySQL
 echo '* Starting mysql...'
-mysqld_safe --nowatch --datadir='/var/lib/mysql'
+/etc/init.d/mariadb start
 sleep 5
 
 # Generate /home/userSpace/environmentParameters.php
 rm -f /home/userSpace/environmentParameters.php
-sudo -u apache /bin/sh /var/www/html/OS/spark/scripts/getCPUs.sh
+sudo -u www-data bash /var/www/html/OS/spark/scripts/getCPUs.sh
 rm -f /var/run/apache2/httpd.pid
 
 # Apache
 echo '* Starting apache...'
-apachectl start
+apache2ctl start
 
 # Initialize ML settings
 mysql -uroot -ppaloalto <<-EOF
@@ -48,10 +51,13 @@ ALTER TABLE pandbRBAC.ml_settings AUTO_INCREMENT = 1;
 INSERT INTO pandbRBAC.ml_settings(server) values('$(hostname -i)');
 EOF
 
-# PanReadOrders 
+# PanReadOrders
 echo '* Starting PanReadOrders...'
 while ! nc -w 1 localhost 5672 </dev/null; do
   echo "waiting on rabbitmq..."
   sleep 2
 done
-sudo -u apache /bin/sh /var/www/html/OS/startup/pan-readOrders start
+
+/etc/init.d/panReadOrders start
+
+tail -f /dev/null
